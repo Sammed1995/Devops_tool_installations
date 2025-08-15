@@ -1,10 +1,12 @@
 Setup Kubernetes Cluster with kubeadm (v1.29)
 This readme helps you to create a kubernetes cluster using kubeadm on AWS Ubuntu machine.
+
 Pre-requisites:
 t2.medium AWS EC2 instances
 Root user access
 15GB root volumes
 SSH access to all instances
+
 Step 1: Launch EC2 Instances
 Launch 2 x t2.medium EC2 instances with 15GB root volumes. In the "Advanced Details" section of the launch configuration, add the following to the User Data to disable swap:
 
@@ -17,6 +19,8 @@ sudo swapoff -a
 sudo apt install sed -y
 
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+
 Step 2: Install Container Runtime on Each Server
 SSH into each server using their public IP and install containerd:
 
@@ -25,6 +29,8 @@ sudo apt update && apt install containerd -y
 ps -ef | grep -i containerd | grep -v grep
 
 netstat -nltp | grep -i containerd | grep -v grep
+
+
 Step 3: Install Kubernetes Tools
 Follow the Kubernetes official documentation to install the necessary tools for Kubernetes.
 
@@ -35,15 +41,12 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 
 sudo apt-mark hold kubelet kubeadm kubectl
+
+
 Step 4: Initialize the Control Plane (Master Node)
 On the master node, enable necessary kernel modules and initialize the Kubernetes control plane:
-
 sudo modprobe br_netfilter
-
 echo 1 > /proc/sys/net/ipv4/ip_forward
-
-
-
 sudo kubeadm init --cri-socket /run/containerd/containerd.sock \
 
 --pod-network-cidr=192.168.0.0/16
@@ -57,12 +60,14 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 Verify that the Kubernetes control plane is running:
 
 kubectl get pods -n kube-system
+
 Step 5: Install Calico CNI for Pod Networking
 Install the Calico CNI plugin to enable pod networking:
 
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
 
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
+
 Step 6: Adding Worker Nodes to the Cluster
 Disable Swap on Worker Nodes
 Log in to each worker node and disable swap:
