@@ -21,3 +21,12 @@ Fetch the initial password of argocd server
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 Username: admin
 Now, go to User Info and update your argocd password
+
+login to Argocd
+ argocd login 52.53.156.187:32738 --username admin
+Check how many clusters are available in argocd
+argocd cluster list
+Get your cluster name
+kubectl config get-contexts
+Add your cluster to argocd
+argocd cluster add Wanderlust@wanderlust.us-west-1.eksctl.io --name wanderlust-eks-cluster
